@@ -391,6 +391,21 @@
     </div>
     <div class="scroll-content">
 
+      <!-- Tema visual -->
+      <div class="aj-section-btn" onclick="toggleAjSection('aj-tema-body')">
+        <span>🎨 Tema visual</span><span class="aj-chevron" id="chv-tema">›</span>
+      </div>
+      <div id="aj-tema-body" class="aj-section-body" style="display:none">
+        <div class="tema-grid">
+          <div class="tema-chip tema-azul-chip"    onclick="setTema('tema-azul')"    id="tc-tema-azul">☀️ Azul</div>
+          <div class="tema-chip tema-verde-chip"   onclick="setTema('tema-verde')"   id="tc-tema-verde">🌿 Verde</div>
+          <div class="tema-chip tema-naranja-chip" onclick="setTema('tema-naranja')" id="tc-tema-naranja">🔥 Naranja</div>
+          <div class="tema-chip tema-morado-chip"  onclick="setTema('tema-morado')"  id="tc-tema-morado">💜 Morado</div>
+          <div class="tema-chip tema-oscuro-chip"  onclick="setTema('tema-oscuro')"  id="tc-tema-oscuro">🌙 Oscuro</div>
+          <div class="tema-chip tema-negro-chip"   onclick="setTema('tema-negro')"   id="tc-tema-negro">⚫ Negro</div>
+        </div>
+      </div>
+
       <!-- Datos empresa (colapsable) -->
       <div class="aj-section-btn" onclick="toggleAjSection('aj-empresa-body')">
         <span>🏢 Datos de la empresa</span><span class="aj-chevron" id="chv-empresa">›</span>
@@ -442,7 +457,7 @@
         <button class="btn btn-primary" id="aj-update-btn" onclick="buscarActualizacion()">🔍 Buscar actualización</button>
       </div>
 
-      <div style="text-align:center;color:var(--text-muted);font-size:12px;padding:12px">ClimaPro v1.5 · Web Edition</div>
+      <div style="text-align:center;color:var(--text-muted);font-size:12px;padding:12px">ClimaPro v1.6 · Web Edition</div>
     </div>
   </div>
 
@@ -553,13 +568,13 @@
 <div class="toast" id="toast"></div>
 
 <!-- Scripts -->
-<script src="js/db.js?v=3"></script>
-<script src="js/utils.js?v=3"></script>
-<script src="js/nav.js?v=3"></script>
-<script src="js/montajes.js?v=3"></script>
-<script src="js/averias.js?v=3"></script>
-<script src="js/mantenimientos.js?v=3"></script>
-<script src="js/otros.js?v=3"></script>
-<script src="js/app.js?v=3"></script>
+<script src="js/db.js?v=4"></script>
+<script src="js/utils.js?v=4"></script>
+<script src="js/nav.js?v=4"></script>
+<script src="js/montajes.js?v=4"></script>
+<script src="js/averias.js?v=4"></script>
+<script src="js/mantenimientos.js?v=4"></script>
+<script src="js/otros.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
 </body>
 </html>

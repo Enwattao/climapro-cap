@@ -123,6 +123,7 @@ function renderAvisos() {
 // ═══════════════════════════════════════════════════════
 function renderAjustes() {
   const p = DB.prefs.get();
+  actualizarChipsTema(p.tema || 'tema-azul');
   document.getElementById('aj-empresa').value = p.empresa || '';
   document.getElementById('aj-telefono').value = p.telefono || '';
   document.getElementById('aj-direccion').value = p.direccion || '';
@@ -156,11 +157,38 @@ function saveSonidos() {
 
 function toggleAjSection(id) {
   const body = document.getElementById(id);
-  const chvMap = { 'aj-empresa-body': 'chv-empresa', 'aj-sonidos-body': 'chv-sonidos', 'aj-update-body': 'chv-update' };
+  const chvMap = { 'aj-tema-body':'chv-tema', 'aj-empresa-body':'chv-empresa', 'aj-sonidos-body':'chv-sonidos', 'aj-update-body':'chv-update' };
   const chv = document.getElementById(chvMap[id]);
   const open = body.style.display === 'none';
   body.style.display = open ? 'block' : 'none';
   if (chv) chv.textContent = open ? '⌄' : '›';
+}
+
+// ═══════════════════════════════════════════════════════
+//  TEMAS
+// ═══════════════════════════════════════════════════════
+const TEMAS = ['tema-azul','tema-verde','tema-naranja','tema-morado','tema-oscuro','tema-negro'];
+
+function setTema(tema) {
+  document.body.classList.remove(...TEMAS);
+  document.body.classList.add(tema);
+  const p = DB.prefs.get();
+  DB.prefs.set({ ...p, tema });
+  actualizarChipsTema(tema);
+}
+
+function actualizarChipsTema(tema) {
+  TEMAS.forEach(t => {
+    const el = document.getElementById('tc-' + t);
+    if (el) el.classList.toggle('activo', t === tema);
+  });
+}
+
+function aplicarTemaGuardado() {
+  const p = DB.prefs.get();
+  const tema = p.tema || 'tema-azul';
+  document.body.classList.add(tema);
+  actualizarChipsTema(tema);
 }
 
 // Sintetizador de sonidos de alerta
@@ -210,7 +238,7 @@ function playAlertSound(tipoAviso) {
 
 // Actualización vía GitHub Releases
 const GITHUB_REPO = 'enwattao/climapro-cap';
-const VERSION_ACTUAL = '1.5';
+const VERSION_ACTUAL = '1.6';
 
 async function buscarActualizacion() {
   const btn = document.getElementById('aj-update-btn');
@@ -279,6 +307,7 @@ async function descargarActualizacion(url, nombre) {
 //  INIT
 // ═══════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  aplicarTemaGuardado();
   // Nav inferior
   document.getElementById('nav-home').onclick = () => { Nav.show('screen-home'); renderHome(); };
   document.getElementById('nav-montajes').onclick = () => { Nav.show('screen-montajes'); renderMontajes(); };

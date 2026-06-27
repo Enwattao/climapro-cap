@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-def keystorePropsFile = rootProject.file("../../keystore.properties")
+def keystorePropsFile = rootProject.file("../keystore.properties")
 def keystoreProps = new Properties()
 if (keystorePropsFile.exists()) { keystoreProps.load(new FileInputStream(keystorePropsFile)) }
 
@@ -11,8 +11,8 @@ android {
         applicationId "com.climapro.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

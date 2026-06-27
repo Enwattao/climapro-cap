@@ -257,7 +257,7 @@ async function buscarActualizacion() {
       if (apkAsset) {
         btn.textContent = '⬇️ Descargar v' + tagVersion;
         btn.disabled = false;
-        btn.onclick = () => descargarActualizacion(apkAsset.browser_download_url, apkAsset.name);
+        btn.onclick = () => descargarActualizacion(apkAsset.browser_download_url);
       } else {
         btn.textContent = '🔍 Buscar actualización';
         btn.disabled = false;
@@ -276,31 +276,14 @@ async function buscarActualizacion() {
   }
 }
 
-async function descargarActualizacion(url, nombre) {
-  if (window.Capacitor && Capacitor.isNativePlatform()) {
-    toast('Descargando actualización...');
-    try {
-      const res = await fetch(url);
-      const blob = await res.blob();
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const b64 = reader.result.split(',')[1];
-        const written = await Capacitor.Plugins.Filesystem.writeFile({
-          path: nombre, data: b64, directory: 'CACHE', recursive: true
-        });
-        await Capacitor.Plugins.Share.share({
-          title: 'Instalar ' + nombre,
-          url: written.uri,
-          dialogTitle: 'Instalar actualización ClimaPro'
-        });
-      };
-      reader.readAsDataURL(blob);
-    } catch(e) {
-      toast('Error al descargar: ' + e.message);
-    }
+function descargarActualizacion(url) {
+  // Abre la URL en el navegador del sistema → el download manager de Android descarga el APK
+  if (window.Capacitor && Capacitor.isNativePlatform() && Capacitor.Plugins.Browser) {
+    Capacitor.Plugins.Browser.open({ url });
   } else {
     window.open(url, '_blank');
   }
+  toast('Abriendo descarga...');
 }
 
 // ═══════════════════════════════════════════════════════

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "climapro-cap",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "www", "-p", "8234", "--cors"],
+      "port": 8234
+    }
+  ]
+}

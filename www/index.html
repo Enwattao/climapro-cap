@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>ClimaPro</title>
+<link rel="stylesheet" href="css/app.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ════════════════════════════════════════════════
+       SCREENS
+       ════════════════════════════════════════════════ -->
+
+  <!-- HOME -->
+  <div id="screen-home" class="screen">
+    <div class="home-header">
+      <div class="app-row">
+        <div>
+          <div class="app-name">❄️ ClimaPro</div>
+          <div class="app-sub">Gestión profesional</div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" id="bell-btn" onclick="Nav.show('screen-avisos');renderAvisos()" style="position:relative">
+            🔔<span id="bell-badge" class="bell-badge" style="display:none"></span>
+          </button>
+          <button class="icon-btn" onclick="Nav.show('screen-ajustes');renderAjustes()">⚙️</button>
+        </div>
+      </div>
+      <div class="fecha" id="home-fecha"></div>
+      <div class="stats-row">
+        <div class="stat-pill"><div class="dot" style="background:var(--azul-light)"></div><span id="home-montajes-mes">0</span> montajes</div>
+        <div class="stat-pill"><div class="dot" style="background:var(--rojo-light)"></div><span id="home-averias-activas">0</span> averías activas</div>
+      </div>
+    </div>
+    <div class="scroll-content">
+      <div class="kpi-row">
+        <div class="kpi-card" onclick="Nav.show('screen-montajes');renderMontajes()">
+          <div class="kpi-icon" style="background:var(--azul-light)">🔧</div>
+          <div class="kpi-value" id="kpi-montajes-mes" style="color:var(--azul)">-</div>
+          <div class="kpi-label">Montajes mes</div>
+        </div>
+        <div class="kpi-card" onclick="Nav.show('screen-averias');renderAverias()">
+          <div class="kpi-icon" style="background:var(--rojo-light)">⚠️</div>
+          <div class="kpi-value" id="kpi-averias-act" style="color:var(--rojo)">-</div>
+          <div class="kpi-label">Averías activas</div>
+        </div>
+      </div>
+      <div class="section-header">⚡ Acciones</div>
+      <div class="tpv-grid">
+        <button class="tpv-btn" style="background:var(--azul)" onclick="openMontajeForm()"><span class="tpv-icon">➕</span>Nuevo Montaje</button>
+        <button class="tpv-btn" style="background:var(--rojo)" onclick="openAveriaForm()"><span class="tpv-icon">⚠️</span>Nueva Avería</button>
+        <button class="tpv-btn" style="background:var(--verde)" onclick="Nav.show('screen-mantenimientos');renderMantenimientos()"><span class="tpv-icon">🔧</span>Manteni­miento</button>
+        <button class="tpv-btn" style="background:var(--naranja)" onclick="Nav.show('screen-gastos');renderGastos()"><span class="tpv-icon">🧾</span>Nuevo Gasto</button>
+        <button class="tpv-btn" style="background:var(--morado)" onclick="Nav.show('screen-notas');renderNotas()"><span class="tpv-icon">📝</span>Notas</button>
+        <button class="tpv-btn" style="background:var(--gris)" onclick="Nav.show('screen-resumen');renderResumen()"><span class="tpv-icon">📊</span>Resumen / Consulta</button>
+      </div>
+      <div id="home-proximos"></div>
+    </div>
+  </div>
+
+  <!-- MONTAJES LISTA -->
+  <div id="screen-montajes" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.show('screen-home');renderHome()">‹</button>
+      <h1>Montajes</h1>
+      <button class="icon-btn" onclick="openMontajeForm()">＋</button>
+    </div>
+    <div class="scroll-content" id="montajes-list"></div>
+    <button class="fab" onclick="openMontajeForm()">＋</button>
+  </div>
+
+  <!-- MONTAJE DETALLE -->
+  <div id="screen-montaje-detalle" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Ficha montaje</h1>
+      <button class="icon-btn" onclick="openMontajeForm(_editMontajeId)">✏️</button>
+      <button class="icon-btn" style="background:rgba(239,68,68,.2)" onclick="eliminarMontaje(_editMontajeId)">🗑</button>
+    </div>
+    <div class="scroll-content" style="padding:0" id="montaje-det-content"></div>
+  </div>
+
+  <!-- MONTAJE FORM -->
+  <div id="screen-montaje-form" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1 id="mf-title">Nuevo montaje</h1>
+    </div>
+    <div class="scroll-content">
+      <div class="card">
+        <div class="card-title">👤 CLIENTE</div>
+        <div class="form-group"><label class="form-label">Nombre *</label><input id="mf-cliente" class="form-input" placeholder="Nombre del cliente"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input id="mf-telefono" class="form-input" type="tel" placeholder="600 000 000"></div>
+        <div class="form-group"><label class="form-label">Dirección</label><input id="mf-direccion" class="form-input" placeholder="Calle, nº, ciudad"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">❄️ EQUIPO</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Marca</label><input id="mf-marca" class="form-input" placeholder="Daikin…"></div>
+          <div class="form-group"><label class="form-label">Modelo</label><input id="mf-modelo" class="form-input" placeholder="FTXC35…"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tipo</label>
+            <select id="mf-tipo" class="form-input">
+              <option value="split">Split</option><option value="cassette">Cassette</option>
+              <option value="conductos">Conductos</option><option value="suelo">Suelo-techo</option>
+              <option value="vrv">VRV/VRF</option><option value="industrial">Industrial</option><option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Unidades</label><input id="mf-num" class="form-input" type="number" min="1" value="1"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📅 PLANIFICACIÓN</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Fecha</label><input id="mf-fecha" class="form-input" type="date"></div>
+          <div class="form-group"><label class="form-label">Hora</label><input id="mf-hora" class="form-input" type="time"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Duración estimada (horas)</label><input id="mf-horas" class="form-input" type="number" step="0.5" placeholder="4"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💶 ECONÓMICO</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Presupuesto (€)</label><input id="mf-presupuesto" class="form-input" type="number" step="0.01" placeholder="0.00"></div>
+          <div class="form-group"><label class="form-label">Sueldo ayudante (€)</label><input id="mf-ayudante" class="form-input" type="number" step="0.01" placeholder="0.00"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Estado</label>
+          <select id="mf-estado" class="form-input">
+            <option value="pendiente">Pendiente</option><option value="lista_espera">Lista de espera</option>
+            <option value="en_curso">En curso</option><option value="realizado">Realizado</option><option value="cobrado">Cobrado</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📝 OBSERVACIONES</div>
+        <textarea id="mf-obs" class="form-input" placeholder="Notas del trabajo…"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="saveMontaje()">💾 Guardar montaje</button>
+    </div>
+  </div>
+
+  <!-- AVERÍAS LISTA -->
+  <div id="screen-averias" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.show('screen-home');renderHome()">‹</button>
+      <h1>Averías</h1>
+      <button class="icon-btn" onclick="openAveriaForm()">＋</button>
+    </div>
+    <div class="scroll-content" id="averias-list"></div>
+    <button class="fab" onclick="openAveriaForm()">＋</button>
+  </div>
+
+  <!-- AVERÍA DETALLE -->
+  <div id="screen-averia-detalle" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Ficha avería</h1>
+      <button class="icon-btn" onclick="openAveriaForm(_editAveriaId)">✏️</button>
+      <button class="icon-btn" style="background:rgba(239,68,68,.2)" onclick="eliminarAveria(_editAveriaId)">🗑</button>
+    </div>
+    <div class="scroll-content" style="padding:0" id="averia-det-content"></div>
+  </div>
+
+  <!-- AVERÍA FORM -->
+  <div id="screen-averia-form" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1 id="af-title">Nueva avería</h1>
+    </div>
+    <div class="scroll-content">
+      <div class="card">
+        <div class="card-title">👤 CLIENTE</div>
+        <div class="form-group"><label class="form-label">Nombre *</label><input id="af-cliente" class="form-input" placeholder="Nombre del cliente"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input id="af-telefono" class="form-input" type="tel"></div>
+        <div class="form-group"><label class="form-label">Dirección</label><input id="af-direccion" class="form-input"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ AVERÍA</div>
+        <div class="form-group"><label class="form-label">Descripción</label><textarea id="af-descripcion" class="form-input" placeholder="Describe la avería…"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Marca</label><input id="af-marca" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Modelo</label><input id="af-modelo" class="form-input"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Presupuesto (€)</label><input id="af-presupuesto" class="form-input" type="number" step="0.01"></div>
+          <div class="form-group"><label class="form-label">Estado</label>
+            <select id="af-estado" class="form-input">
+              <option value="pendiente">Pendiente</option><option value="en_proceso">En proceso</option>
+              <option value="resuelta">Resuelta</option><option value="cobrada">Cobrada</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-switch">
+          <label>🔴 Urgente</label>
+          <label class="switch"><input type="checkbox" id="af-urgente"><span class="slider"></span></label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📝 OBSERVACIONES</div>
+        <textarea id="af-obs" class="form-input"></textarea>
+      </div>
+      <button class="btn btn-rojo" onclick="saveAveria()">💾 Guardar avería</button>
+    </div>
+  </div>
+
+  <!-- MANTENIMIENTOS -->
+  <div id="screen-mantenimientos" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Mantenimientos</h1>
+      <button class="icon-btn" onclick="openMantenimientoForm()">＋</button>
+    </div>
+    <div class="scroll-content" id="mantenimientos-list"></div>
+    <button class="fab" style="background:var(--verde)" onclick="openMantenimientoForm()">＋</button>
+  </div>
+
+  <!-- MANTENIMIENTO FORM -->
+  <div id="screen-mant-form" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1 id="mantf-title">Nuevo mantenimiento</h1>
+    </div>
+    <div class="scroll-content">
+      <div class="card">
+        <div class="card-title">👤 CLIENTE</div>
+        <div class="form-group"><label class="form-label">Nombre *</label><input id="mantf-cliente" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input id="mantf-telefono" class="form-input" type="tel"></div>
+        <div class="form-group"><label class="form-label">Dirección</label><input id="mantf-direccion" class="form-input"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔧 MANTENIMIENTO</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tipo</label>
+            <select id="mantf-tipo" class="form-input">
+              <option value="preventivo">Preventivo</option><option value="correctivo">Correctivo</option><option value="revision">Revisión</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Periodicidad</label>
+            <select id="mantf-periodo" class="form-input">
+              <option value="mensual">Mensual</option><option value="trimestral">Trimestral</option>
+              <option value="semestral">Semestral</option><option value="anual">Anual</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Fecha</label><input id="mantf-fecha" class="form-input" type="date"></div>
+          <div class="form-group"><label class="form-label">Precio (€)</label><input id="mantf-precio" class="form-input" type="number" step="0.01"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📝 OBSERVACIONES</div>
+        <textarea id="mantf-obs" class="form-input"></textarea>
+      </div>
+      <button class="btn btn-verde" onclick="saveMantenimiento()">💾 Guardar</button>
+    </div>
+  </div>
+
+  <!-- GASTOS -->
+  <div id="screen-gastos" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Gastos</h1>
+      <button class="icon-btn" onclick="openGastoForm()">＋</button>
+    </div>
+    <div class="scroll-content" id="gastos-list"></div>
+    <button class="fab" style="background:var(--naranja)" onclick="openGastoForm()">＋</button>
+  </div>
+
+  <!-- GASTO FORM -->
+  <div id="screen-gasto-form" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1 id="gf-title">Nuevo gasto</h1>
+    </div>
+    <div class="scroll-content">
+      <div class="card">
+        <div class="form-group"><label class="form-label">Concepto *</label><input id="gf-concepto" class="form-input" placeholder="Ej: Tuberías cobre"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Importe (€)</label><input id="gf-importe" class="form-input" type="number" step="0.01"></div>
+          <div class="form-group"><label class="form-label">Fecha</label><input id="gf-fecha" class="form-input" type="date"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Categoría</label>
+          <select id="gf-categoria" class="form-input">
+            <option value="materiales">Materiales</option><option value="sueldo_ayudante">Sueldo ayudante</option>
+            <option value="herramientas">Herramientas</option><option value="combustible">Combustible</option>
+            <option value="seguros">Seguros</option><option value="otros">Otros</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Notas</label><textarea id="gf-notas" class="form-input" rows="2"></textarea></div>
+      </div>
+      <button class="btn btn-naranja" style="background:var(--naranja);color:#fff" onclick="saveGasto()">💾 Guardar gasto</button>
+    </div>
+  </div>
+
+  <!-- NOTAS -->
+  <div id="screen-notas" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.show('screen-home');renderHome()">‹</button>
+      <h1>Notas</h1>
+      <button class="icon-btn" onclick="openNotaForm()">＋</button>
+    </div>
+    <div class="scroll-content" id="notas-list"></div>
+    <button class="fab" style="background:var(--morado)" onclick="openNotaForm()">＋</button>
+  </div>
+
+  <!-- NOTA FORM -->
+  <div id="screen-nota-form" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1 id="nf-title">Nueva nota</h1>
+    </div>
+    <div class="scroll-content">
+      <div class="card">
+        <div class="form-group"><label class="form-label">Título *</label><input id="nf-titulo" class="form-input" placeholder="Título de la nota"></div>
+        <div class="form-group"><label class="form-label">Contenido</label><textarea id="nf-contenido" class="form-input" style="min-height:200px" placeholder="Escribe aquí…"></textarea></div>
+      </div>
+      <button class="btn" style="background:var(--morado);color:#fff" onclick="saveNota()">💾 Guardar nota</button>
+    </div>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div id="screen-calendario" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.show('screen-home');renderHome()">‹</button>
+      <h1>Calendario</h1>
+    </div>
+    <div class="scroll-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px">
+        <button class="btn btn-sm btn-outline" id="cal-prev">‹</button>
+        <span style="font-weight:700;font-size:16px;text-transform:capitalize" id="cal-mes"></span>
+        <button class="btn btn-sm btn-outline" id="cal-next">›</button>
+      </div>
+      <div style="padding:0 8px"><div id="cal-grid-wrap"></div></div>
+      <div id="cal-eventos-dia" style="padding:0 4px 8px"></div>
+    </div>
+  </div>
+
+  <!-- RESUMEN -->
+  <div id="screen-resumen" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Resumen / Consulta</h1>
+    </div>
+    <div class="scroll-content">
+      <div class="card" style="padding:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <button class="btn btn-sm btn-outline" id="res-prev">‹</button>
+          <span style="font-weight:600;font-size:15px" id="res-mes"></span>
+          <button class="btn btn-sm btn-outline" id="res-next">›</button>
+        </div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:var(--verde-light)">📈</div>
+          <div class="kpi-value" id="res-ingresos" style="color:var(--verde)">-</div>
+          <div class="kpi-label">Ingresos cobrados</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:var(--rojo-light)">📉</div>
+          <div class="kpi-value" id="res-gastos-val" style="color:var(--rojo)">-</div>
+          <div class="kpi-label">Gastos</div>
+        </div>
+      </div>
+      <div class="resumen-beneficio card" id="res-beneficio-card">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted)">BENEFICIO NETO</div>
+          <div style="font-size:12px;color:var(--text-muted)">Ingresos − Gastos</div>
+        </div>
+        <div class="beneficio-value" id="res-beneficio">-</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔧 MONTAJES</div>
+        <div class="detail-row"><span class="dr-label">Total mes</span><span class="dr-value" id="res-montajes">-</span></div>
+        <div class="detail-row"><span class="dr-label">Cobrados</span><span class="dr-value" style="color:var(--verde)" id="res-cobrados">-</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🧾 DETALLE GASTOS</div>
+        <div id="res-det-gastos"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AJUSTES -->
+  <div id="screen-ajustes" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Ajustes</h1>
+    </div>
+    <div class="scroll-content">
+
+      <!-- Datos empresa (colapsable) -->
+      <div class="aj-section-btn" onclick="toggleAjSection('aj-empresa-body')">
+        <span>🏢 Datos de la empresa</span><span class="aj-chevron" id="chv-empresa">›</span>
+      </div>
+      <div id="aj-empresa-body" class="aj-section-body" style="display:none">
+        <div class="form-group"><label class="form-label">Nombre empresa</label><input id="aj-empresa" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input id="aj-telefono" class="form-input" type="tel"></div>
+        <div class="form-group"><label class="form-label">Dirección</label><input id="aj-direccion" class="form-input"></div>
+        <button class="btn btn-primary" onclick="saveAjustes()">💾 Guardar datos</button>
+      </div>
+
+      <!-- Sonidos de alertas (colapsable) -->
+      <div class="aj-section-btn" onclick="toggleAjSection('aj-sonidos-body')">
+        <span>🔔 Sonidos de alertas</span><span class="aj-chevron" id="chv-sonidos">›</span>
+      </div>
+      <div id="aj-sonidos-body" class="aj-section-body" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Sonido para montajes próximos</label>
+          <select id="aj-snd-montaje" class="form-input">
+            <option value="ding">Ding suave</option>
+            <option value="beep">Beep doble</option>
+            <option value="alarm">Alarma</option>
+            <option value="none">Sin sonido</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sonido para averías urgentes</label>
+          <select id="aj-snd-averia" class="form-input">
+            <option value="alarm">Alarma</option>
+            <option value="ding">Ding suave</option>
+            <option value="beep">Beep doble</option>
+            <option value="none">Sin sonido</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" onclick="probarSonido('montaje')">▶ Probar montaje</button>
+          <button class="btn btn-outline" onclick="probarSonido('averia')">▶ Probar avería</button>
+        </div>
+        <button class="btn btn-primary" style="margin-top:10px" onclick="saveSonidos()">💾 Guardar sonidos</button>
+      </div>
+
+      <!-- Actualización -->
+      <div class="aj-section-btn" onclick="toggleAjSection('aj-update-body')">
+        <span>⬆️ Actualización</span><span class="aj-chevron" id="chv-update">›</span>
+      </div>
+      <div id="aj-update-body" class="aj-section-body" style="display:none">
+        <div style="color:var(--text-muted);font-size:13px;margin-bottom:10px">Versión instalada: <strong>v1.5</strong></div>
+        <div id="aj-update-info" style="font-size:13px;margin-bottom:10px"></div>
+        <button class="btn btn-primary" id="aj-update-btn" onclick="buscarActualizacion()">🔍 Buscar actualización</button>
+      </div>
+
+      <div style="text-align:center;color:var(--text-muted);font-size:12px;padding:12px">ClimaPro v1.5 · Web Edition</div>
+    </div>
+  </div>
+
+  <!-- AVISOS -->
+  <div id="screen-avisos" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Avisos</h1>
+    </div>
+    <div class="scroll-content" id="avisos-list"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       BOTTOM NAV
+       ════════════════════════════════════════════════ -->
+  <nav class="bottomnav">
+    <button class="nav-item active" id="nav-home"><span class="nav-icon">🏠</span>Inicio</button>
+    <button class="nav-item" id="nav-montajes">
+      <span class="nav-icon">🔧</span>Montajes
+      <span class="nav-badge" id="badge-montajes" style="display:none"></span>
+    </button>
+    <button class="nav-item" id="nav-averias">
+      <span class="nav-icon">⚠️</span>Averías
+      <span class="nav-badge" id="badge-averias" style="display:none"></span>
+    </button>
+    <button class="nav-item" id="nav-notas"><span class="nav-icon">📝</span>Notas</button>
+    <button class="nav-item" id="nav-calendario"><span class="nav-icon">📅</span>Calendario</button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- ════════════════════════════════════════════════
+     MODALES
+     ════════════════════════════════════════════════ -->
+
+<!-- Modal Cobro -->
+<div class="modal-overlay" id="cobro-modal">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h2>Registrar cobro</h2>
+      <button class="modal-close" onclick="closeModal('cobro-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Importe cobrado (€)</label><input id="cobro-importe" class="form-input" type="number" step="0.01"></div>
+      <div class="form-group"><label class="form-label">Método de pago</label>
+        <select id="cobro-metodo" class="form-input">
+          <option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option>
+          <option value="tarjeta">Tarjeta</option><option value="pendiente">Pendiente</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-verde" id="cobro-save">✅ Confirmar cobro</button></div>
+  </div>
+</div>
+
+<!-- Modal Asignar Fecha -->
+<div class="modal-overlay" id="fecha-modal">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h2>Asignar fecha</h2>
+      <button class="modal-close" onclick="closeModal('fecha-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Fecha</label><input id="fecha-fecha" class="form-input" type="date"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Hora</label><input id="fecha-hora" class="form-input" type="time"></div>
+        <div class="form-group"><label class="form-label">Horas estimadas</label><input id="fecha-horas" class="form-input" type="number" step="0.5" min="0"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" id="fecha-save">📅 Guardar fecha</button></div>
+  </div>
+</div>
+
+<!-- Modal Firma -->
+<div class="modal-overlay" id="firma-modal">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h2>✍️ Firma del cliente</h2>
+      <button class="modal-close" onclick="closeModal('firma-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-muted)">Firme en el recuadro:</p>
+      <div class="firma-canvas-wrap"><canvas id="firma-canvas"></canvas></div>
+      <button class="btn btn-outline btn-sm" style="width:auto" onclick="borrarFirma()">🗑 Borrar</button>
+    </div>
+    <div class="modal-footer">
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="saltarFirma()">Sin firma</button>
+        <button class="btn btn-primary" onclick="guardarFirmaYPdf()">📄 Generar PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert dialog -->
+<div class="alert-overlay" id="alert-overlay">
+  <div class="alert-box">
+    <h3 id="alert-title"></h3>
+    <p id="alert-msg"></p>
+    <div class="alert-btns">
+      <button class="btn btn-outline" id="alert-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="alert-ok">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Scripts -->
+<script src="js/db.js?v=3"></script>
+<script src="js/utils.js?v=3"></script>
+<script src="js/nav.js?v=3"></script>
+<script src="js/montajes.js?v=3"></script>
+<script src="js/averias.js?v=3"></script>
+<script src="js/mantenimientos.js?v=3"></script>
+<script src="js/otros.js?v=3"></script>
+<script src="js/app.js?v=3"></script>
+</body>
+</html>

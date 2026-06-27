@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+def keystorePropsFile = rootProject.file("../../keystore.properties")
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) { keystoreProps.load(new FileInputStream(keystorePropsFile)) }
+
 android {
     namespace = "com.climapro.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -18,10 +22,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("C:/Users/enwattao/Claude/Projects/ClimaPro-Cap/climapro.jks")
-            storePassword "climapro2024"
-            keyAlias "climapro"
-            keyPassword "climapro2024"
+            storeFile file(keystoreProps['storeFile'] ?: '')
+            storePassword keystoreProps['storePassword'] ?: ''
+            keyAlias keystoreProps['keyAlias'] ?: ''
+            keyPassword keystoreProps['keyPassword'] ?: ''
         }
     }
     buildTypes {

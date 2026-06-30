@@ -27,9 +27,44 @@ function openMantDetalle(id) {
   const m = DB.mantenimientos.getById(id);
   if (!m) return;
   _editMantId = id;
-  Nav.show('screen-mantenimientos');
-  // Para simplicidad, abre el formulario de edición directamente
-  openMantenimientoForm(id);
+
+  const realizado = m.estado === 'realizado';
+  document.getElementById('mant-detalle-body').innerHTML = `
+    <div class="card">
+      <div class="card-title">👤 CLIENTE</div>
+      <div class="detalle-row"><span class="detalle-label">Nombre</span><span>${Utils.escapeHtml(m.cliente)}</span></div>
+      ${m.telefono ? `<div class="detalle-row"><span class="detalle-label">Teléfono</span><a href="tel:${m.telefono}">${m.telefono}</a></div>` : ''}
+      ${m.direccion ? `<div class="detalle-row"><span class="detalle-label">Dirección</span><span>${Utils.escapeHtml(m.direccion)}</span></div>` : ''}
+    </div>
+    <div class="card">
+      <div class="card-title">🔧 MANTENIMIENTO</div>
+      <div class="detalle-row"><span class="detalle-label">Tipo</span><span>${m.tipo||'-'}</span></div>
+      <div class="detalle-row"><span class="detalle-label">Periodicidad</span><span>${m.periodo||'-'}</span></div>
+      <div class="detalle-row"><span class="detalle-label">Fecha</span><span>${m.fecha ? Utils.fechaLarga(m.fecha) : 'Sin fecha'}</span></div>
+      <div class="detalle-row"><span class="detalle-label">Precio</span><span style="font-weight:600;color:var(--verde)">${Utils.euros(m.precio||0)}</span></div>
+      <div class="detalle-row"><span class="detalle-label">Estado</span>
+        <span class="chip chip-${realizado ? 'verde' : 'azul'}">${realizado ? '✅ Realizado' : '⏳ Pendiente'}</span>
+      </div>
+    </div>
+    ${m.observaciones ? `<div class="card"><div class="card-title">📝 OBSERVACIONES</div><p style="font-size:14px;line-height:1.5">${Utils.escapeHtml(m.observaciones)}</p></div>` : ''}
+    <div style="display:flex;flex-direction:column;gap:10px;padding-bottom:16px">
+      ${!realizado ? `<button class="btn btn-verde" onclick="marcarMantRealizado(${id})">✅ Marcar como realizado</button>` : ''}
+      <button class="btn btn-outline" onclick="openMantenimientoForm(${id})">✏️ Editar</button>
+      <button class="btn btn-rojo" onclick="eliminarMant(${id})">🗑️ Eliminar</button>
+    </div>`;
+
+  Nav.show('screen-mant-detalle');
+}
+
+function marcarMantRealizado(id) {
+  const m = DB.mantenimientos.getById(id);
+  if (!m) return;
+  m.estado = 'realizado';
+  m.fechaRealizado = Date.now();
+  DB.mantenimientos.save(m);
+  toast('Marcado como realizado');
+  openMantDetalle(id);
+  renderMantenimientos();
 }
 
 function openMantenimientoForm(id = null) {

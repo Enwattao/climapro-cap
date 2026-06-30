@@ -55,6 +55,7 @@
         <button class="tpv-btn" style="background:var(--verde)" onclick="Nav.show('screen-mantenimientos');renderMantenimientos()"><span class="tpv-icon">🔧</span>Manteni­miento</button>
         <button class="tpv-btn" style="background:var(--naranja)" onclick="Nav.show('screen-gastos');renderGastos()"><span class="tpv-icon">🧾</span>Nuevo Gasto</button>
         <button class="tpv-btn" style="background:var(--morado)" onclick="Nav.show('screen-notas');renderNotas()"><span class="tpv-icon">📝</span>Notas</button>
+        <button class="tpv-btn" style="background:var(--morado)" onclick="Nav.show('screen-otrostrabajos');renderOtrostrabajos()"><span class="tpv-icon">💼</span>Otros Trabajos</button>
         <button class="tpv-btn" style="background:var(--gris)" onclick="Nav.show('screen-resumen');renderResumen()"><span class="tpv-icon">📊</span>Resumen / Consulta</button>
       </div>
       <div id="home-proximos"></div>
@@ -480,6 +481,56 @@
     <div class="scroll-content" id="avisos-list"></div>
   </div>
 
+  <!-- OTROS TRABAJOS LISTA -->
+  <div id="screen-otrostrabajos" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Otros Trabajos</h1>
+      <button class="icon-btn" onclick="openOtroForm()">＋</button>
+    </div>
+    <div class="scroll-content" id="otrostrabajos-list"></div>
+    <button class="fab" style="background:var(--morado)" onclick="openOtroForm()">＋</button>
+  </div>
+
+  <!-- OTROS TRABAJOS DETALLE -->
+  <div id="screen-otro-detalle" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1>Detalle</h1>
+      <button class="icon-btn" onclick="openOtroForm(_editOtroId)">✏️</button>
+    </div>
+    <div class="scroll-content" id="otro-detalle-body"></div>
+  </div>
+
+  <!-- OTROS TRABAJOS FORM -->
+  <div id="screen-otro-form" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="Nav.back()">‹</button>
+      <h1 id="otro-form-title">Nuevo trabajo</h1>
+    </div>
+    <div class="scroll-content">
+      <div class="card">
+        <div class="card-title">💼 TIPO DE TRABAJO</div>
+        <div class="form-group"><label class="form-label">Nombre del trabajo *</label><input id="otf-nombre" class="form-input" placeholder="Ej: Instalación, Pintura, Reforma..."></div>
+        <div class="form-group"><label class="form-label">Descripción</label><textarea id="otf-descripcion" class="form-input" rows="3" placeholder="Detalles del trabajo..."></textarea></div>
+      </div>
+      <div class="card">
+        <div class="card-title">👤 CLIENTE</div>
+        <div class="form-group"><label class="form-label">Nombre</label><input id="otf-cliente" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input id="otf-telefono" class="form-input" type="tel"></div>
+        <div class="form-group"><label class="form-label">Dirección</label><input id="otf-direccion" class="form-input"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💰 ECONÓMICO</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Fecha</label><input id="otf-fecha" class="form-input" type="date"></div>
+          <div class="form-group"><label class="form-label">Precio (€)</label><input id="otf-precio" class="form-input" type="number" step="0.01"></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="background:var(--morado)" onclick="saveOtro()">💾 Guardar</button>
+    </div>
+  </div>
+
   <!-- ════════════════════════════════════════════════
        BOTTOM NAV
        ════════════════════════════════════════════════ -->
@@ -578,13 +629,14 @@
 <div class="toast" id="toast"></div>
 
 <!-- Scripts -->
-<script src="js/db.js?v=7"></script>
-<script src="js/utils.js?v=7"></script>
-<script src="js/nav.js?v=7"></script>
-<script src="js/montajes.js?v=7"></script>
-<script src="js/averias.js?v=7"></script>
-<script src="js/mantenimientos.js?v=7"></script>
-<script src="js/otros.js?v=7"></script>
-<script src="js/app.js?v=7"></script>
+<script src="js/db.js?v=8"></script>
+<script src="js/utils.js?v=8"></script>
+<script src="js/nav.js?v=8"></script>
+<script src="js/montajes.js?v=8"></script>
+<script src="js/averias.js?v=8"></script>
+<script src="js/mantenimientos.js?v=8"></script>
+<script src="js/otros.js?v=8"></script>
+<script src="js/otrostrabajos.js?v=8"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>

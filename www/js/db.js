@@ -109,11 +109,32 @@ const DB = (() => {
     delete: (id) => write('notas', read('notas').filter(n => n.id !== id)),
   };
 
+  // ── OTROS TRABAJOS ────────────────────────────────────────
+  const otrostrabajos = {
+    getAll: () => read('otrostrabajos').sort((a, b) => (b.creadoEn || 0) - (a.creadoEn || 0)),
+    getById: (id) => read('otrostrabajos').find(t => t.id === id),
+    getEnRango: (inicio, fin) => read('otrostrabajos').filter(t => t.creadoEn >= inicio && t.creadoEn < fin),
+    save: (t) => {
+      const list = read('otrostrabajos');
+      if (t.id) {
+        const i = list.findIndex(x => x.id === t.id);
+        if (i >= 0) list[i] = t; else list.push(t);
+      } else {
+        t.id = nextId(list);
+        t.creadoEn = Date.now();
+        list.push(t);
+      }
+      write('otrostrabajos', list);
+      return t;
+    },
+    delete: (id) => write('otrostrabajos', read('otrostrabajos').filter(t => t.id !== id)),
+  };
+
   // ── PREFS ─────────────────────────────────────────────────
   const prefs = {
     get: () => readObj('prefs', { empresa: '', telefono: '', direccion: '' }),
     set: (obj) => writeObj('prefs', { ...prefs.get(), ...obj }),
   };
 
-  return { montajes, averias, mantenimientos, gastos, notas, prefs };
+  return { montajes, averias, mantenimientos, gastos, notas, otrostrabajos, prefs };
 })();

@@ -238,7 +238,7 @@ function playAlertSound(tipoAviso) {
 
 // Actualización vía GitHub Releases
 const GITHUB_REPO = 'enwattao/climapro-cap';
-const VERSION_ACTUAL = '1.9';
+const VERSION_ACTUAL = '2.0';
 
 async function buscarActualizacion() {
   const btn = document.getElementById('aj-update-btn');

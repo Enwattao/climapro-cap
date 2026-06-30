@@ -10,17 +10,22 @@ function renderMantenimientos() {
     cont.innerHTML = `<div class="empty"><div class="empty-icon">🔧</div><p>Sin mantenimientos registrados</p></div>`;
     return;
   }
-  cont.innerHTML = list.map(m => `
+  cont.innerHTML = list.map(m => {
+    const realizado = m.estado === 'realizado';
+    const color = realizado ? 'var(--text-muted)' : 'var(--verde)';
+    return `
     <div class="list-item" onclick="openMantDetalle(${m.id})">
-      <div class="item-stripe" style="background:var(--verde)"></div>
+      <div class="item-stripe" style="background:${color}"></div>
       <div class="item-body">
         <div class="item-title">${Utils.escapeHtml(m.cliente)}</div>
         <div class="item-sub">${m.tipo||''} · ${m.periodo||''} · ${m.fecha ? Utils.fechaCorta(m.fecha) : 'Sin fecha'}</div>
       </div>
-      <div class="item-right">
-        ${m.precio ? `<div style="font-weight:600;color:var(--verde)">${Utils.euros(m.precio)}</div>` : ''}
+      <div class="item-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        ${m.precio ? `<div style="font-weight:600;color:${color}">${Utils.euros(m.precio)}</div>` : ''}
+        <div class="chip chip-${realizado ? 'gris' : 'verde'}" style="font-size:10px">${realizado ? '✅ Realizado' : '⏳ Pendiente'}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function openMantDetalle(id) {

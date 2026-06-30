@@ -127,9 +127,11 @@ function renderResumen() {
   const gastos = DB.gastos.getEnRango(inicio, fin);
   const averias = DB.averias.getEnRango(inicio, fin);
 
+  const mantenimientosMes = DB.mantenimientos.getAll().filter(m => m.fecha && m.fecha >= inicio && m.fecha <= fin);
   const cobradosMontajes = montajes.filter(m => m.estado === 'cobrado' || m.estado === 'realizado');
   const ingresos = cobradosMontajes.reduce((s, m) => s + (m.importeCobrado || 0), 0)
-    + averias.filter(a => a.estado === 'cobrada').reduce((s, a) => s + (a.importeCobrado || 0), 0);
+    + averias.filter(a => a.estado === 'cobrada').reduce((s, a) => s + (a.importeCobrado || 0), 0)
+    + mantenimientosMes.filter(m => m.estado === 'realizado').reduce((s, m) => s + (m.precio || 0), 0);
   const gastoTotal = gastos.reduce((s, g) => s + (g.importe || 0), 0);
   const beneficio = ingresos - gastoTotal;
 
